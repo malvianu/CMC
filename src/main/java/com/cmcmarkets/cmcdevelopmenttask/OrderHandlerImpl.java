@@ -133,29 +133,26 @@ public class OrderHandlerImpl implements OrderHandler{
     }
 
     private void updateOrderBookForRemoval(Order order) {
+
         OrderBook orderBook = orderBooks.get(order.getSymbol());
+
+        TreeSet<OrderBookItem> orderBookItems;
+
         if(order.getSide() == Side.SELL) {
-            TreeSet<OrderBookItem> sellOrderBookItems = orderBook.getSellOrderBook();
-            OrderBookItem existingOrderBookItem = sellOrderBookItems.stream().filter(orderBookItem -> orderBookItem.getPrice() == order.getPrice()).findAny().get();
-            if(existingOrderBookItem.getQuantity() == order.getQuantity()) {
-                sellOrderBookItems.remove(existingOrderBookItem);
-            } else {
-                existingOrderBookItem.setQuantity(existingOrderBookItem.getQuantity()-order.getQuantity());
-                sellOrderBookItems.add(existingOrderBookItem);
-            }
-            orderBook.setSellOrderBook(sellOrderBookItems);
+            orderBookItems = orderBook.getSellOrderBook();
+        } else {
+            orderBookItems = orderBook.getBuyOrderBook();
         }
 
-        if(order.getSide() == Side.BUY) {
-            TreeSet<OrderBookItem> buyOrderBookItems = orderBook.getBuyOrderBook();
-            OrderBookItem existingOrderBookItem = buyOrderBookItems.stream().filter(orderBookItem -> orderBookItem.getPrice() == order.getPrice()).findAny().get();
-            if(existingOrderBookItem.getQuantity() == order.getQuantity()) {
-                buyOrderBookItems.remove(existingOrderBookItem);
-            } else {
-                existingOrderBookItem.setQuantity(existingOrderBookItem.getQuantity()-order.getQuantity());
-                existingOrderBookItem.setCount(existingOrderBookItem.getCount()-1);
-            }
-            orderBook.setBuyOrderBook(buyOrderBookItems);
+        OrderBookItem existingOrderBookItem = orderBookItems.stream().filter(orderBookItem -> orderBookItem.getPrice() == order.getPrice()).findAny().get();
+        if(existingOrderBookItem.getQuantity() == order.getQuantity()) {
+            orderBookItems.remove(existingOrderBookItem);
+        } else {
+            existingOrderBookItem.setQuantity(existingOrderBookItem.getQuantity()-order.getQuantity());
+            existingOrderBookItem.setCount(existingOrderBookItem.getCount()-1);
         }
     }
+
+
 }
+
