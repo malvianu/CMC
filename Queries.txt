@@ -1,0 +1,14 @@
+In the CmcDevelopmentTaskReadMe.pdf file there is a section a A few important notes:
+Point 4 : A typical order might have 4 or more modifications applied to it before being removed. I couldn't understand the meaning of this line and how to use this
+in coding exercise.
+
+In the OrderHandler.java interface
+/**
+     * Please implement this method so we are able to create an instance
+     * of your OrderHandler implementation.
+     */
+    static OrderHandler createInstance() {
+        return null;
+    }
+
+Couldn't understand how to implement this as this is static
