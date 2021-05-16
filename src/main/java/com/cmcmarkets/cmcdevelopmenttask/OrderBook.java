@@ -1,29 +1,29 @@
 package com.cmcmarkets.cmcdevelopmenttask;
 
-import java.util.TreeSet;
+import java.util.SortedSet;
 
 public class OrderBook {
-    private TreeSet<OrderBookItem> buyOrderBook;
-    private TreeSet<OrderBookItem> sellOrderBook;
+    private SortedSet<OrderBookItem> buyOrderBook;
+    private SortedSet<OrderBookItem> sellOrderBook;
 
-    public OrderBook(TreeSet<OrderBookItem> buyOrderBook, TreeSet<OrderBookItem> sellOrderBook) {
+    public OrderBook(SortedSet<OrderBookItem> buyOrderBook, SortedSet<OrderBookItem> sellOrderBook) {
         this.buyOrderBook = buyOrderBook;
         this.sellOrderBook = sellOrderBook;
     }
 
-    public TreeSet<OrderBookItem> getBuyOrderBook() {
+    public SortedSet<OrderBookItem> getBuyOrderBook() {
         return buyOrderBook;
     }
 
-    public TreeSet<OrderBookItem> getSellOrderBook() {
+    public SortedSet<OrderBookItem> getSellOrderBook() {
         return sellOrderBook;
     }
 
-    public void setBuyOrderBook(TreeSet<OrderBookItem> buyOrderBook) {
+    public void setBuyOrderBook(SortedSet<OrderBookItem> buyOrderBook) {
         this.buyOrderBook = buyOrderBook;
     }
 
-    public void setSellOrderBook(TreeSet<OrderBookItem> sellOrderBook) {
+    public void setSellOrderBook(SortedSet<OrderBookItem> sellOrderBook) {
         this.sellOrderBook = sellOrderBook;
     }
 }

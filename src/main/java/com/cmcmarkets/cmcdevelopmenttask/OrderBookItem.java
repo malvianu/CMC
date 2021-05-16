@@ -1,9 +1,5 @@
 package com.cmcmarkets.cmcdevelopmenttask;
 
-import java.util.Objects;
-import java.util.TreeMap;
-import java.util.concurrent.ConcurrentMap;
-
 public class OrderBookItem {
 
     private int count;

@@ -24,7 +24,7 @@ public class ExampleData {
 
         orderHandler.addOrder(new Order(8L, "MSFT", Side.BUY, 10, 13));
         orderHandler.addOrder(new Order(9L, "MSFT", Side.BUY, 10, 13));
-        orderHandler.printOrderBook("MSFT");
+        //orderHandler.printOrderBook("MSFT");
         orderHandler.getCurrentPrice("MSFT", 6, Side.SELL);
         System.out.println(orderHandler.getCurrentPrice("MSFT", 6, Side.SELL));
         System.out.println(orderHandler.getCurrentPrice("MSFT", 17, Side.SELL));

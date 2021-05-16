@@ -9,8 +9,6 @@ public interface OrderHandler {
 
     double getCurrentPrice(String symbol, int quantity, Side side);
 
-    void printOrderBook(String symbol);
-
     /**
      * Please implement this method so we are able to create an instance
      * of your OrderHandler implementation.
