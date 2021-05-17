@@ -21,7 +21,6 @@ public interface OrderBookHelper {
                     orderBookItems = orderBooks.get(order.getSymbol()).getBuyOrderBook();
                 }
 
-                OrderBookItem orderBookItem = new OrderBookItem(1,order.getQuantity(), order.getPrice());
                 Optional<OrderBookItem> existingOrderBookItem = findExistingOrderBookItem(order, orderBookItems);
 
                 if(existingOrderBookItem.isPresent()) {
@@ -29,6 +28,7 @@ public interface OrderBookHelper {
                     existingOrderBookItem1.setCount(existingOrderBookItem1.getCount()+1);
                     existingOrderBookItem1.setQuantity(existingOrderBookItem1.getQuantity()+order.getQuantity());
                 } else {
+                    OrderBookItem orderBookItem = new OrderBookItem(1,order.getQuantity(), order.getPrice());
                     orderBookItems.add(orderBookItem);
                 }
 
