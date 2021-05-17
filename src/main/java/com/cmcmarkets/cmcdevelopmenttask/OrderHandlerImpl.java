@@ -36,13 +36,7 @@ public class OrderHandlerImpl implements OrderHandler{
 
     @Override
     public double getCurrentPrice(String symbol, int quantity, Side side) {
-        SortedSet<OrderBookItem> orderBookItems;
-        if(side.equals(Side.SELL)) {
-            orderBookItems = orderBooks.get(symbol).getSellOrderBook();
-        } else {
-            orderBookItems = orderBooks.get(symbol).getBuyOrderBook();
-        }
-
+        SortedSet<OrderBookItem> orderBookItems = OrderBookHelper.getOrderBookItems(side, orderBooks.get(symbol));
         return calculatePrice(quantity, orderBookItems);
     }
 

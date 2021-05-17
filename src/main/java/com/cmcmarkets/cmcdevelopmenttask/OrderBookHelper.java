@@ -8,58 +8,54 @@ import java.util.TreeSet;
 
 public interface OrderBookHelper {
 
-    final Comparator<OrderBookItem> sellOrderComparator = Comparator.comparingInt(OrderBookItem::getPrice);
+    Comparator<OrderBookItem> sellOrderComparator = Comparator.comparingInt(OrderBookItem::getPrice);
 
-    final Comparator<OrderBookItem> buyOrderComparator = Comparator.comparingInt(OrderBookItem::getPrice).reversed();
+    Comparator<OrderBookItem> buyOrderComparator = Comparator.comparingInt(OrderBookItem::getPrice).reversed();
 
-    public static void updateOrderBook(Order order, Map<String, OrderBook> orderBooks) {
+     static void updateOrderBook(Order order, Map<String, OrderBook> orderBooks) {
         if(orderBooks.containsKey(order.getSymbol())) {
-            SortedSet<OrderBookItem> orderBookItems;
-                if(order.getSide().equals(Side.SELL)) {
-                    orderBookItems = orderBooks.get(order.getSymbol()).getSellOrderBook();
-                } else {
-                    orderBookItems = orderBooks.get(order.getSymbol()).getBuyOrderBook();
-                }
+            SortedSet<OrderBookItem> orderBookItems = getOrderBookItems(order.getSide(), orderBooks.get(order.getSymbol()));
+            Optional<OrderBookItem> existingOrderBookItem = findExistingOrderBookItem(order, orderBookItems);
 
-                Optional<OrderBookItem> existingOrderBookItem = findExistingOrderBookItem(order, orderBookItems);
-
-                if(existingOrderBookItem.isPresent()) {
-                    OrderBookItem existingOrderBookItem1 = existingOrderBookItem.get();
-                    existingOrderBookItem1.setCount(existingOrderBookItem1.getCount()+1);
-                    existingOrderBookItem1.setQuantity(existingOrderBookItem1.getQuantity()+order.getQuantity());
-                } else {
-                    OrderBookItem orderBookItem = new OrderBookItem(1,order.getQuantity(), order.getPrice());
-                    orderBookItems.add(orderBookItem);
-                }
-
-
-        } else {
-
-            OrderBookItem orderBookItem = new OrderBookItem(1, order.getQuantity(), order.getPrice());
-            SortedSet<OrderBookItem> sellOrderBook = new TreeSet<>(sellOrderComparator);
-            SortedSet<OrderBookItem> buyOrderBook = new TreeSet<>(buyOrderComparator);
-            if(order.getSide().equals(Side.SELL)) {
-               sellOrderBook.add(orderBookItem);
+            if(existingOrderBookItem.isPresent()) {
+                OrderBookItem existingOrderBookItem1 = existingOrderBookItem.get();
+                existingOrderBookItem1.setCount(existingOrderBookItem1.getCount()+1);
+                existingOrderBookItem1.setQuantity(existingOrderBookItem1.getQuantity()+order.getQuantity());
             } else {
-               buyOrderBook.add(orderBookItem);
+                OrderBookItem orderBookItem = new OrderBookItem(1,order.getQuantity(), order.getPrice());
+                orderBookItems.add(orderBookItem);
             }
-
-            OrderBook newOrderBook = new OrderBook(buyOrderBook, sellOrderBook);
+        } else {
+            OrderBook newOrderBook = initializeOrderBookForNewSymbol(order);
             orderBooks.put(order.getSymbol(),  newOrderBook);
         }
     }
 
-     static void updateOrderBookForRemoval(Order order, Map<String, OrderBook> orderBooks) {
+    static OrderBook initializeOrderBookForNewSymbol(Order order) {
+        OrderBookItem orderBookItem = new OrderBookItem(1, order.getQuantity(), order.getPrice());
+        SortedSet<OrderBookItem> sellOrderBook = new TreeSet<>(sellOrderComparator);
+        SortedSet<OrderBookItem> buyOrderBook = new TreeSet<>(buyOrderComparator);
+        if(order.getSide().equals(Side.SELL)) {
+           sellOrderBook.add(orderBookItem);
+        } else {
+           buyOrderBook.add(orderBookItem);
+        }
 
-        OrderBook orderBook = orderBooks.get(order.getSymbol());
+        return new OrderBook(buyOrderBook, sellOrderBook);
+    }
 
-         SortedSet<OrderBookItem> orderBookItems;
-
-        if(order.getSide() == Side.SELL) {
+    static SortedSet<OrderBookItem> getOrderBookItems(Side side, OrderBook orderBook) {
+        SortedSet<OrderBookItem> orderBookItems;
+        if (side.equals(Side.SELL)) {
             orderBookItems = orderBook.getSellOrderBook();
         } else {
             orderBookItems = orderBook.getBuyOrderBook();
         }
+        return orderBookItems;
+    }
+
+    static void updateOrderBookForRemoval(Order order, Map<String, OrderBook> orderBooks) {
+        SortedSet<OrderBookItem> orderBookItems = getOrderBookItems(order.getSide(), orderBooks.get(order.getSymbol()));
 
         Optional<OrderBookItem> existingOrderBookItem = findExistingOrderBookItem(order, orderBookItems);
         if(existingOrderBookItem.isPresent()) {
