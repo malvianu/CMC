@@ -11,9 +11,9 @@ public class OrderBookHelper {
     private OrderBookHelper() {
     }
 
-    private static final Comparator<OrderBookItem> sellOrderComparator = Comparator.comparingInt(OrderBookItem::getPrice);
+    public static final Comparator<OrderBookItem> sellOrderComparator = Comparator.comparingInt(OrderBookItem::getPrice);
 
-    private static final Comparator<OrderBookItem> buyOrderComparator = Comparator.comparingInt(OrderBookItem::getPrice).reversed();
+    public static final Comparator<OrderBookItem> buyOrderComparator = Comparator.comparingInt(OrderBookItem::getPrice).reversed();
 
      public static void updateOrderBook(Order order, Map<String, OrderBook> orderBooks) {
         if(orderBooks.containsKey(order.getSymbol())) {
@@ -34,25 +34,12 @@ public class OrderBookHelper {
         }
     }
 
-    private static OrderBook initializeOrderBookForNewSymbol(Order order) {
-        OrderBookItem orderBookItem = new OrderBookItem(1, order.getQuantity(), order.getPrice());
-        SortedSet<OrderBookItem> sellOrderBook = new TreeSet<>(sellOrderComparator);
-        SortedSet<OrderBookItem> buyOrderBook = new TreeSet<>(buyOrderComparator);
-        if(order.getSide().equals(Side.SELL)) {
-           sellOrderBook.add(orderBookItem);
-        } else {
-           buyOrderBook.add(orderBookItem);
-        }
-
-        return new OrderBook(buyOrderBook, sellOrderBook);
-    }
-
     public static SortedSet<OrderBookItem> getOrderBookItems(Side side, OrderBook orderBook) {
         SortedSet<OrderBookItem> orderBookItems;
         if (side.equals(Side.SELL)) {
-            orderBookItems = orderBook.getSellOrderBook();
+            orderBookItems = orderBook.getSellOrderBookItems();
         } else {
-            orderBookItems = orderBook.getBuyOrderBook();
+            orderBookItems = orderBook.getBuyOrderBookItems();
         }
         return orderBookItems;
     }
@@ -71,6 +58,36 @@ public class OrderBookHelper {
             }
         }
 
+    }
+
+    public static double calculatePrice(int quantity, SortedSet<OrderBookItem> orderBookItems) {
+        double price = 0.0;
+        int originalQuantity = quantity;
+        for(OrderBookItem orderBookItem : orderBookItems) {
+            if(quantity <= 0 ) {
+                break;
+            } else if(quantity <= orderBookItem.getQuantity()){
+                price = price + orderBookItem.getPrice()*quantity;
+                quantity = quantity - orderBookItem.getQuantity();
+            } else {
+                price = price + orderBookItem.getPrice()*orderBookItem.getQuantity();
+                quantity = quantity - orderBookItem.getQuantity();
+            }
+        }
+        return price/originalQuantity;
+    }
+
+    private static OrderBook initializeOrderBookForNewSymbol(Order order) {
+        OrderBookItem orderBookItem = new OrderBookItem(1, order.getQuantity(), order.getPrice());
+        SortedSet<OrderBookItem> sellOrderBook = new TreeSet<>(sellOrderComparator);
+        SortedSet<OrderBookItem> buyOrderBook = new TreeSet<>(buyOrderComparator);
+        if(order.getSide().equals(Side.SELL)) {
+            sellOrderBook.add(orderBookItem);
+        } else {
+            buyOrderBook.add(orderBookItem);
+        }
+
+        return new OrderBook(buyOrderBook, sellOrderBook);
     }
 
     private static Optional<OrderBookItem> findExistingOrderBookItem(Order order, SortedSet<OrderBookItem> orderBookItems) {

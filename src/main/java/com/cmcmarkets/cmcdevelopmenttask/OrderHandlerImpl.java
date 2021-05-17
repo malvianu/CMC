@@ -37,28 +37,11 @@ public class OrderHandlerImpl implements OrderHandler{
     @Override
     public double getCurrentPrice(String symbol, int quantity, Side side) {
         SortedSet<OrderBookItem> orderBookItems = OrderBookHelper.getOrderBookItems(side, orderBooks.get(symbol));
-        return calculatePrice(quantity, orderBookItems);
+        return OrderBookHelper.calculatePrice(quantity, orderBookItems);
     }
 
     private Optional<Order> getExistingOrder(long orderId) {
         return orders.stream().filter(order -> order.getOrderId() == orderId).findAny();
-    }
-
-    private Double calculatePrice(int quantity, SortedSet<OrderBookItem> orderBookItems) {
-        double price = 0.0;
-        int originalQuantity = quantity;
-        for(OrderBookItem orderBookItem : orderBookItems) {
-            if(quantity <= 0 ) {
-                break;
-            } else if(quantity <= orderBookItem.getQuantity()){
-                price = price + orderBookItem.getPrice()*quantity;
-                quantity = quantity - orderBookItem.getQuantity();
-            } else {
-                price = price + orderBookItem.getPrice()*orderBookItem.getQuantity();
-                quantity = quantity - orderBookItem.getQuantity();
-            }
-        }
-        return price/originalQuantity;
     }
 }
 
