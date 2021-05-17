@@ -6,13 +6,16 @@ import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-public interface OrderBookHelper {
+public class OrderBookHelper {
 
-    Comparator<OrderBookItem> sellOrderComparator = Comparator.comparingInt(OrderBookItem::getPrice);
+    private OrderBookHelper() {
+    }
 
-    Comparator<OrderBookItem> buyOrderComparator = Comparator.comparingInt(OrderBookItem::getPrice).reversed();
+    private static final Comparator<OrderBookItem> sellOrderComparator = Comparator.comparingInt(OrderBookItem::getPrice);
 
-     static void updateOrderBook(Order order, Map<String, OrderBook> orderBooks) {
+    private static final Comparator<OrderBookItem> buyOrderComparator = Comparator.comparingInt(OrderBookItem::getPrice).reversed();
+
+     public static void updateOrderBook(Order order, Map<String, OrderBook> orderBooks) {
         if(orderBooks.containsKey(order.getSymbol())) {
             SortedSet<OrderBookItem> orderBookItems = getOrderBookItems(order.getSide(), orderBooks.get(order.getSymbol()));
             Optional<OrderBookItem> existingOrderBookItem = findExistingOrderBookItem(order, orderBookItems);
@@ -31,7 +34,7 @@ public interface OrderBookHelper {
         }
     }
 
-    static OrderBook initializeOrderBookForNewSymbol(Order order) {
+    private static OrderBook initializeOrderBookForNewSymbol(Order order) {
         OrderBookItem orderBookItem = new OrderBookItem(1, order.getQuantity(), order.getPrice());
         SortedSet<OrderBookItem> sellOrderBook = new TreeSet<>(sellOrderComparator);
         SortedSet<OrderBookItem> buyOrderBook = new TreeSet<>(buyOrderComparator);
@@ -44,7 +47,7 @@ public interface OrderBookHelper {
         return new OrderBook(buyOrderBook, sellOrderBook);
     }
 
-    static SortedSet<OrderBookItem> getOrderBookItems(Side side, OrderBook orderBook) {
+    public static SortedSet<OrderBookItem> getOrderBookItems(Side side, OrderBook orderBook) {
         SortedSet<OrderBookItem> orderBookItems;
         if (side.equals(Side.SELL)) {
             orderBookItems = orderBook.getSellOrderBook();
@@ -54,7 +57,7 @@ public interface OrderBookHelper {
         return orderBookItems;
     }
 
-    static void updateOrderBookForRemoval(Order order, Map<String, OrderBook> orderBooks) {
+    public static void updateOrderBookForRemoval(Order order, Map<String, OrderBook> orderBooks) {
         SortedSet<OrderBookItem> orderBookItems = getOrderBookItems(order.getSide(), orderBooks.get(order.getSymbol()));
 
         Optional<OrderBookItem> existingOrderBookItem = findExistingOrderBookItem(order, orderBookItems);
@@ -70,7 +73,7 @@ public interface OrderBookHelper {
 
     }
 
-    static Optional<OrderBookItem> findExistingOrderBookItem(Order order, SortedSet<OrderBookItem> orderBookItems) {
+    private static Optional<OrderBookItem> findExistingOrderBookItem(Order order, SortedSet<OrderBookItem> orderBookItems) {
         return orderBookItems.stream().filter(orderBookItem -> orderBookItem.getPrice() == order.getPrice()).findAny();
     }
 }
